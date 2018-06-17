@@ -121,6 +121,10 @@ class RouteHandler(object):
             self._post_batches_total_time = TimerWrapper()
             self._post_batches_validator_time = TimerWrapper()
 
+    async def cors_handler(self, request):
+      # Parse request
+      return self._wrap_response(request, data=None, metadata=None)
+                    
     async def submit_batches(self, request):
         """Accepts a binary encoded BatchList and submits it to the validator.
 
@@ -134,10 +138,6 @@ class RouteHandler(object):
         """
         timer_ctx = self._post_batches_total_time.time()
         self._post_batches_count.inc()
-
-        # Parse request
-        if request.method == "OPTIONS":
-            return self._wrap_response(request, data=None, metadata=None)
 
         if request.headers['Content-Type'] != 'application/octet-stream':
             LOGGER.debug(
