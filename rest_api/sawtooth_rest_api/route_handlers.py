@@ -125,8 +125,8 @@ class RouteHandler(object):
       retval = self._wrap_response(
          request,
          status=202)
-      retval.header('Access-Control-Allow-Origin', '*')
-      retval.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
+      retval.headers['Access-Control-Allow-Origin'] = '*'
+      retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
       return retval
                 
     async def submit_batches(self, request):
