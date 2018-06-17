@@ -136,6 +136,9 @@ class RouteHandler(object):
         self._post_batches_count.inc()
 
         # Parse request
+        if request.method == "OPTIONS":
+            return self._wrap_response(request, data=None, metadata=None)
+
         if request.headers['Content-Type'] != 'application/octet-stream':
             LOGGER.debug(
                 'Submission headers had wrong Content-Type: %s',
