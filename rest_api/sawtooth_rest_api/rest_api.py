@@ -22,6 +22,7 @@ from urllib.parse import urlparse
 import platform
 import pkg_resources
 from aiohttp import web
+from aiohttp.web import middleware
 
 from zmq.asyncio import ZMQEventLoop
 from pyformance import MetricsRegistry
@@ -45,7 +46,15 @@ from sawtooth_rest_api.config import RestApiConfig
 LOGGER = logging.getLogger(__name__)
 DISTRIBUTION_NAME = 'sawtooth-rest-api'
 
-
+# Added middleware to handle CORS
+@middleware
+async def middleware(request, handler):
+  if (request.method === 'OPTIONS') {
+    resp.header('Access-Control-Allow-Origin', '*');
+    resp.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    return resp.sendStatus(200);
+  }
+ 
 def parse_args(args):
     """Parse command line flags added to `rest_api` command.
     """
@@ -103,18 +112,7 @@ def start_rest_api(host, port, connection, timeout, registry,
     LOGGER.info('Creating handlers for validator at %s', connection.url)
 
     handler = RouteHandler(loop, connection, timeout, registry)
-
-    # Modified routes for CORS
-    app.use("/batches", function (req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-        if (req.method === 'OPTIONS') {
-          res.sendStatus(200);
-        } else {
-          next();
-        }
-    });
-    
+   
     app.router.add_post('/batches', handler.submit_batches)
 
     app.router.add_get('/batch_statuses', handler.list_statuses)
