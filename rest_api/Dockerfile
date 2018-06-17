@@ -35,7 +35,6 @@ RUN apt-get install -y -q --allow-downgrades \
 RUN apt-get install -y -q --allow-downgrades \
     python3-aiodns \
     python3-aiohttp \
-    python3-aiohttp-cors \
     python3-colorlog \
     python3-cchardet\
     python3-pyformance \
