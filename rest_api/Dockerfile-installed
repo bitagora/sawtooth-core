@@ -19,7 +19,7 @@ FROM ubuntu:artful as sawtooth-signing-builder
 
 ENV VERSION=AUTO_STRICT
 
-RUN echo "deb http://repo.sawtooth.me/ubuntu/ci xenial universe" >> /etc/apt/sources.list \
+RUN echo "deb http://repo.sawtooth.me/ubuntu/ci artful universe" >> /etc/apt/sources.list \
  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8AA7AF1F1091A5FD \
  && apt-get update \
  && apt-get install -y -q --allow-downgrades \
@@ -43,11 +43,11 @@ RUN /project/bin/protogen \
 
 # -------------=== python sdk build ===-------------
 
-FROM ubuntu:xenial as sawtooth-sdk-python-builder
+FROM ubuntu:artful as sawtooth-sdk-python-builder
 
 ENV VERSION=AUTO_STRICT
 
-RUN echo "deb http://repo.sawtooth.me/ubuntu/ci xenial universe" >> /etc/apt/sources.list \
+RUN echo "deb http://repo.sawtooth.me/ubuntu/ci artful universe" >> /etc/apt/sources.list \
  && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 8AA7AF1F1091A5FD \
  && apt-get update \
  && apt-get install -y -q --allow-downgrades \
