@@ -22,6 +22,7 @@ from urllib.parse import urlparse
 import platform
 import pkg_resources
 from aiohttp import web
+import aiohttp_cors
 
 from zmq.asyncio import ZMQEventLoop
 from pyformance import MetricsRegistry
@@ -104,7 +105,19 @@ def start_rest_api(host, port, connection, timeout, registry,
 
     handler = RouteHandler(loop, connection, timeout, registry)
 
-    app.router.add_post('/batches', handler.submit_batches)
+    # Modified routes for CORS
+    cors = aiohttp_cors.setup(app, defaults={
+      "*": aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+        )
+    })
+    resource = cors.add(app.router.add_resource("/batches"))
+    cors.add(resource.add_route("POST", handler.submit_batches))    
+    
+    # app.router.add_post('/batches', handler.submit_batches)
+
     app.router.add_get('/batch_statuses', handler.list_statuses)
     app.router.add_post('/batch_statuses', handler.list_statuses)
 
