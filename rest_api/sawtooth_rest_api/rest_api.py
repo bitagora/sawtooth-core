@@ -49,7 +49,7 @@ DISTRIBUTION_NAME = 'sawtooth-rest-api'
 # Added middleware to handle CORS
 @middleware
 async def middleware(request, handler):
-  if (request.method === 'OPTIONS') {
+  if (request.method == 'OPTIONS') {
     resp.header('Access-Control-Allow-Origin', '*');
     resp.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
     return resp.sendStatus(200);
