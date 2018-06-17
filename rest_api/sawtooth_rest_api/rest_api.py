@@ -113,7 +113,7 @@ def start_rest_api(host, port, connection, timeout, registry,
     handler = RouteHandler(loop, connection, timeout, registry)
    
     cors_resource = app.router.add_resource('/batches')
-    cors_resource.add_route('OPTIONS', handler.cors_handler)
+    cors_resource.add_route('OPTIONS', handler.submit_batches)
     
     app.router.add_post('/batches', handler.submit_batches)
 
