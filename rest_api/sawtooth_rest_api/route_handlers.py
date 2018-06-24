@@ -149,7 +149,7 @@ class RouteHandler(object):
                 request.headers['Content-Type'])
             self._post_batches_error.inc()
             raise errors.SubmissionWrongContentType()
-
+        
         body = await request.read()
         if not body:
             LOGGER.debug('Submission contained an empty body')
@@ -188,6 +188,10 @@ class RouteHandler(object):
             metadata={'link': link},
             status=status)
 
+        ### Added response headers to allow CORS
+        retval.headers['Access-Control-Allow-Origin'] = '*'
+        retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
+        
         timer_ctx.stop()
         return retval
 
