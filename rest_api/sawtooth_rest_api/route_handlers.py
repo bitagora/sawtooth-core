@@ -254,8 +254,14 @@ class RouteHandler(object):
 
         data = self._drop_id_prefixes(
             self._drop_empty_props(response['batch_statuses']))
+        
+        retval = self._wrap_response(request, data=data, metadata=metadata)
+        
+        ### Added response headers to allow CORS
+        retval.headers['Access-Control-Allow-Origin'] = '*'
+        retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
 
-        return self._wrap_response(request, data=data, metadata=metadata)
+        return retval
 
     async def list_state(self, request):
         """Fetches list of data entries, optionally filtered by address prefix.
