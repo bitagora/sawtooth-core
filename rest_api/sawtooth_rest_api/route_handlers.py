@@ -293,12 +293,18 @@ class RouteHandler(object):
             client_state_pb2.ClientStateListResponse,
             validator_query)
 
-        return self._wrap_paginated_response(
+        retval = self._wrap_paginated_response(
             request=request,
             response=response,
             controls=paging_controls,
             data=response.get('entries', []),
             head=head)
+        
+        ### Added response headers to allow CORS
+        retval.headers['Access-Control-Allow-Origin'] = '*'
+        retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
+        
+        return retval 
 
     async def fetch_state(self, request):
         """Fetches data from a specific address in the validator's state tree.
