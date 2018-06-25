@@ -334,10 +334,16 @@ class RouteHandler(object):
                 state_root=root, address=address),
             error_traps)
 
-        return self._wrap_response(
+        retval = self._wrap_response(
             request,
             data=response['value'],
             metadata=self._get_metadata(request, response, head=head))
+
+        ### Added response headers to allow CORS
+        retval.headers['Access-Control-Allow-Origin'] = '*'
+        retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
+        
+        return retval
 
     async def list_blocks(self, request):
         """Fetches list of blocks from validator, optionally filtered by id.
