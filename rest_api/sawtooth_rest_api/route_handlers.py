@@ -526,31 +526,39 @@ class RouteHandler(object):
 
     
     #### New handler
-    async def fetch_transaction_by_signer(self, request):
-        """Fetches a specific transaction from the validator, specified by signer_public_key.
+    async def list_transactions_by_signer(self, request):
+        """Fetches list of txns from validator filtered by signer_public_key.
 
         Request:
-            path:
+            query:
+                - head: The id of the block to use as the head of the chain
                 - signer_public_key: The 66-character public key of the txn to be fetched
 
         Response:
-            data: A JSON object with the data from the expanded Transaction
+            data: JSON array of Transaction objects with expanded headers
+            head: The head used for this query (most recent if unspecified)
+            link: The link to this exact query, including head block
+            paging: Paging info and nav, like total resources and a next link
         """
-        error_traps = [error_handlers.TransactionNotFoundTrap]
+        paging_controls = self._get_paging_controls(request)
+        validator_query = client_transaction_pb2.ClientTransactionListRequest(
+            head_id=self._get_head_id(request),
+            signer_public_key=self._get_signer_public_key(request),
+            sorting=self._get_sorting_message(request, "default"),
+            paging=self._make_paging_message(paging_controls))
 
-        signer_id = request.match_info.get('signer_public_key', '')
-        
         response = await self._query_validator(
-            Message.CLIENT_TRANSACTION_GET_REQUEST,
-            client_transaction_pb2.ClientTransactionGetResponse,
-            client_transaction_pb2.ClientTransactionGetRequest(
-                signer_public_key=signer_id),
-            error_traps)
+            Message.CLIENT_TRANSACTION_LIST_REQUEST,
+            client_transaction_pb2.ClientTransactionListResponse,
+            validator_query)
 
-        retval = self._wrap_response(
-            request,
-            data=self._expand_transaction(response['transaction']),
-            metadata=self._get_metadata(request, response))
+        data = [self._expand_transaction(t) for t in response['transactions']]
+
+        retval = self._wrap_paginated_response(
+            request=request,
+            response=response,
+            controls=paging_controls,
+            data=data)
         
         ### Added response headers to allow CORS
         retval.headers['Access-Control-Allow-Origin'] = '*'
@@ -1069,6 +1077,14 @@ class RouteHandler(object):
             cls._validate_id(head_id)
 
         return head_id
+    
+    @classmethod
+    def _get_signer_public_key(cls, request):
+        """Parses the `id` filter paramter from the url query.
+        """
+        signer_public_key = request.url.query.get('id', None)
+
+        return signer_public_key 
 
     @classmethod
     def _get_filter_ids(cls, request):
