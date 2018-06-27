@@ -1,0 +1,7 @@
+aiodns
+aiohttp>=2.3.2
+aiohttp_cors
+cchardet
+protobuf
+pyformance
+sawtooth-sdk

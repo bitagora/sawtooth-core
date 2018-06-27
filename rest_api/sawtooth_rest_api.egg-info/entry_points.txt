@@ -1,0 +1,3 @@
+[console_scripts]
+sawtooth-rest-api = sawtooth_rest_api.rest_api:main
+
