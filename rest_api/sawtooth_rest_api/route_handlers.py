@@ -524,6 +524,43 @@ class RouteHandler(object):
             data=self._expand_transaction(response['transaction']),
             metadata=self._get_metadata(request, response))
 
+    
+    #### New handler
+     async def fetch_transaction_by_signer(self, request):
+        """Fetches a specific transaction from the validator, specified by signer_public_key.
+
+        Request:
+            path:
+                - signer_public_key: The 66-character public key of the txn to be fetched
+
+        Response:
+            data: A JSON object with the data from the expanded Transaction
+        """
+        error_traps = [error_handlers.TransactionNotFoundTrap]
+
+        signer_id = request.match_info.get('signer_public_key', '')
+        self._validate_id(signer_id)
+
+        response = await self._query_validator(
+            Message.CLIENT_TRANSACTION_GET_REQUEST,
+            client_transaction_pb2.ClientTransactionGetResponse,
+            client_transaction_pb2.ClientTransactionGetRequest(
+                signer_public_key=signer_id),
+            error_traps)
+
+        retval = self._wrap_response(
+            request,
+            data=self._expand_transaction(response['transaction']),
+            metadata=self._get_metadata(request, response))
+        
+        ### Added response headers to allow CORS
+        retval.headers['Access-Control-Allow-Origin'] = '*'
+        retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
+        
+        return retval
+    
+    ####
+    
     async def list_receipts(self, request):
         """Fetches the receipts for transaction by either a POST or GET.
 
