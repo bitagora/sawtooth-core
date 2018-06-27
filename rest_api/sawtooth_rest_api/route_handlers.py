@@ -539,8 +539,7 @@ class RouteHandler(object):
         error_traps = [error_handlers.TransactionNotFoundTrap]
 
         signer_id = request.match_info.get('signer_public_key', '')
-        self._validate_id(signer_id)
-
+        
         response = await self._query_validator(
             Message.CLIENT_TRANSACTION_GET_REQUEST,
             client_transaction_pb2.ClientTransactionGetResponse,
