@@ -32,6 +32,7 @@ message ClientTransactionListRequest {
     repeated string transaction_ids = 2;
     ClientPagingControls paging = 3;
     repeated ClientSortControls sorting = 4;
+    string signer_public_key = 5;
 }
 
 // A response that lists transactions from newest to oldest.
