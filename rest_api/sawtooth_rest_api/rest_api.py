@@ -132,7 +132,7 @@ def start_rest_api(host, port, connection, timeout, registry,
     ## Custom route to fetch transactions by signer_pubkey
     app.router.add_get(
         '/signer_transactions/{signer_pubkey}',
-        handler.fetch_transaction_by_signer)
+        handler.list_transactions_by_signer)
 
     app.router.add_get('/receipts', handler.list_receipts)
     app.router.add_post('/receipts', handler.list_receipts)
