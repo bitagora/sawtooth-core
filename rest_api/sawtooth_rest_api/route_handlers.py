@@ -526,7 +526,7 @@ class RouteHandler(object):
 
     
     #### New handler
-     async def fetch_transaction_by_signer(self, request):
+    async def fetch_transaction_by_signer(self, request):
         """Fetches a specific transaction from the validator, specified by signer_public_key.
 
         Request:
@@ -557,8 +557,6 @@ class RouteHandler(object):
         retval.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, Content-Length, X-Requested-With'
         
         return retval
-    
-    ####
     
     async def list_receipts(self, request):
         """Fetches the receipts for transaction by either a POST or GET.
