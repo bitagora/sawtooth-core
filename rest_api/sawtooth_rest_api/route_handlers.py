@@ -531,19 +531,16 @@ class RouteHandler(object):
 
         Request:
             query:
-                - head: The id of the block to use as the head of the chain
                 - signer_public_key: The 66-character public key of the txn to be fetched
 
         Response:
             data: JSON array of Transaction objects with expanded headers
-            head: The head used for this query (most recent if unspecified)
             link: The link to this exact query, including head block
             paging: Paging info and nav, like total resources and a next link
         """
         paging_controls = self._get_paging_controls(request)
         validator_query = client_transaction_pb2.ClientTransactionListRequest(
-            head_id=self._get_head_id(request),
-            signer_public_key=self._get_signer_public_key(request),
+            signer_public_key=self._get_filter_signer_public_key(request),
             sorting=self._get_sorting_message(request, "default"),
             paging=self._make_paging_message(paging_controls))
 
@@ -1079,12 +1076,15 @@ class RouteHandler(object):
         return head_id
     
     @classmethod
-    def _get_signer_public_key(cls, request):
+    def _get_filter_signer_public_key(cls, request):
         """Parses the `id` filter paramter from the url query.
         """
-        signer_public_key = request.url.query.get('id', None)
+        id_query = request.url.query.get('id', None)
 
-        return signer_public_key 
+        if id_query is not None:
+            cls._validate_signer_public_key(id_query)
+        
+        return id_query
 
     @classmethod
     def _get_filter_ids(cls, request):
@@ -1100,6 +1100,14 @@ class RouteHandler(object):
             cls._validate_id(filter_id)
 
         return filter_ids
+
+    @staticmethod
+    def _validate_signer_public_key(resource_id):
+        """Confirms a signer_public_key is 66 hex characters, raising an
+        ApiError if not.
+        """
+        if not re.fullmatch('[0-9a-f]{66}', resource_id):
+            raise errors.InvalidResourceId(resource_id)
 
     @staticmethod
     def _validate_id(resource_id):
